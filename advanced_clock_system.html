@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock In/Out System - Plain Text</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #0f0;
+            padding: 20px;
+            line-height: 1.8;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            border: 3px solid #0f0;
+            padding: 25px;
+            background-color: #0a0a0a;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #0f0;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .title {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .current-time {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            border: 2px solid #0f0;
+            padding: 18px;
+            background-color: #050505;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 16px;
+            border-bottom: 2px solid #0f0;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        input[type="date"],
+        input[type="time"],
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #0f0;
+            border: 2px solid #0f0;
+            font-size: 13px;
+            margin-bottom: 8px;
+            resize: vertical;
+        }
+
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            background-color: #0a0a0a;
+            box-shadow: 0 0 10px #0f0;
+        }
+
+        textarea {
+            min-height: 80px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: bold;
+            background-color: #000;
+            color: #0f0;
+            border: 2px solid #0f0;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background-color: #0f0;
+            color: #000;
+            box-shadow: 0 0 10px #0f0;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-in {
+            border-color: #0f0;
+        }
+
+        .btn-out {
+            border-color: #f00;
+            color: #f00;
+        }
+
+        .btn-out:hover {
+            background-color: #f00;
+            color: #000;
+        }
+
+        .status-display {
+            background-color: #000;
+            border: 2px solid #0f0;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .status-line {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #0f0;
+        }
+
+        .status-line:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 12px;
+            min-width: 180px;
+        }
+
+        .status-value {
+            color: #0f0;
+            font-weight: bold;
+        }
+
+        .log-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #0f0;
+            padding: 12px;
+            background-color: #000;
+            margin: 10px 0;
+        }
+
+        .log-entry {
+            margin: 12px 0;
+            padding: 10px;
+            border-left: 3px solid #0f0;
+            padding-left: 12px;
+            font-size: 12px;
+            background-color: #050505;
+        }
+
+        .log-entry.in {
+            border-left-color: #0f0;
+        }
+
+        .log-entry.out {
+            border-left-color: #f00;
+            color: #f00;
+        }
+
+        .log-entry-header {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .log-entry-details {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+
+        .action-badge {
+            font-weight: bold;
+            padding: 2px 6px;
+            margin: 0 6px;
+            background-color: #0f0;
+            color: #000;
+            display: inline-block;
+        }
+
+        .action-badge.out {
+            background-color: #f00;
+            color: #000;
+        }
+
+        .empty-message {
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .last-user-section {
+            margin-top: 20px;
+            border: 3px solid #0f0;
+            padding: 18px;
+            text-align: center;
+            background-color: #050505;
+        }
+
+        .last-user-label {
+            font-size: 13px;
+            text-transform: uppercase;
+            font-weight: bold;
+            opacity: 0.8;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .last-user-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0f0;
+            margin-bottom: 8px;
+        }
+
+        .last-user-details {
+            font-size: 11px;
+            opacity: 0.7;
+            border-top: 1px dashed #0f0;
+            padding-top: 8px;
+        }
+
+        .divider {
+            border-top: 2px solid #0f0;
+            margin: 15px 0;
+            opacity: 0.5;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #0f0;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0f0;
+            opacity: 0.9;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            opacity: 0.5;
+            font-size: 11px;
+            border-top: 2px solid #0f0;
+            padding-top: 15px;
+        }
+
+        .hours-worked {
+            background-color: #0a0a0a;
+            padding: 10px;
+            border-left: 3px solid #0f0;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .status-line {
+                flex-direction: column;
+            }
+
+            .status-label {
+                margin-bottom: 5px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                padding: 10px;
+                font-size: 12px;
+            }
+
+            .title {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">>>> CLOCK IN/OUT SYSTEM <<<</div>
+            <div class="subtitle">[ Plain Text Edition ]</div>
+            <div class="current-time">
+                <span id="currentDateTime">Loading...</span>
+            </div>
+        </div>
+
+        <!-- CLOCK IN/OUT SECTION -->
+        <div class="section">
+            <div class="section-title">Clock In Entry</div>
+            
+            <div class="form-group">
+                <label class="label">Start Date:</label>
+                <input type="date" id="startDate" />
+            </div>
+
+            <div class="form-group">
+                <label class="label">Start Time:</label>
+                <input type="time" id="startTime" />
+            </div>
+
+            <div class="button-group">
+                <button class="btn-in" onclick="clockIn()">[ CLOCK IN ]</button>
+            </div>
+        </div>
+
+        <!-- CLOCK OUT SECTION -->
+        <div class="section">
+            <div class="section-title">Clock Out Entry</div>
+            
+            <div class="form-group">
+                <label class="label">End Date:</label>
+                <input type="date" id="endDate" />
+            </div>
+
+            <div class="form-group">
+                <label class="label">End Time:</label>
+                <input type="time" id="endTime" />
+            </div>
+
+            <div class="form-group">
+                <label class="label">Customer/Location Visited:</label>
+                <textarea id="customerVisited" placeholder="Enter the last customer visited or location details..."></textarea>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-out" onclick="clockOut()">[ CLOCK OUT ]</button>
+            </div>
+        </div>
+
+        <!-- CURRENT STATUS SECTION -->
+        <div class="section">
+            <div class="section-title">Current Status</div>
+            
+            <div class="status-display">
+                <div class="status-line">
+                    <span class="status-label">Status:</span>
+                    <span class="status-value" id="status">NOT CLOCKED IN</span>
+                </div>
+                <div class="status-line">
+                    <span class="status-label">Clock In Date/Time:</span>
+                    <span class="status-value" id="clockInDisplay">--/-- --:--</span>
+                </div>
+                <div class="status-line">
+                    <span class="status-label">Clock Out Date/Time:</span>
+                    <span class="status-value" id="clockOutDisplay">--/-- --:--</span>
+                </div>
+                <div class="status-line">
+                    <span class="status-label">Last Customer/Location:</span>
+                    <span class="status-value" id="lastCustomerDisplay">NONE</span>
+                </div>
+            </div>
+
+            <div class="hours-worked">
+                <div class="status-line">
+                    <span class="status-label">Total Hours Worked:</span>
+                    <span class="status-value" id="hoursWorked">0h 0m 0s</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTIVITY LOG SECTION -->
+        <div class="section">
+            <div class="section-title">Activity Log</div>
+            <div class="log-container" id="logContainer">
+                <div class="empty-message">--- No Activity Yet ---</div>
+            </div>
+        </div>
+
+        <!-- LAST USER VISITED SECTION -->
+        <div class="last-user-section">
+            <div class="last-user-label">>> Last User Session <<<</div>
+            <div class="last-user-name" id="lastUserName">NO ENTRY</div>
+            <div class="last-user-details">
+                <div id="lastUserDetails" style="opacity: 0.6;">No session data available</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            [END OF SYSTEM STATUS] - Data saved to browser storage
+        </div>
+    </div>
+
+    <script>
+        // Data storage
+        let sessionData = {
+            startDate: null,
+            startTime: null,
+            endDate: null,
+            endTime: null,
+            customerVisited: null,
+            isClockedIn: false
+        };
+
+        let logs = JSON.parse(localStorage.getItem('clockInOutLogs')) || [];
+
+        // Update current date/time display
+        function updateCurrentDateTime() {
+            const now = new Date();
+            const dateStr = formatDate(now);
+            const timeStr = formatTime(now);
+            document.getElementById('currentDateTime').textContent = `${dateStr} ${timeStr}`;
+        }
+
+        // Format date to YYYY-MM-DD
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Format time to HH:MM:SS
+        function formatTime(date) {
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        // Clock In Function
+        function clockIn() {
+            const startDate = document.getElementById('startDate').value;
+            const startTime = document.getElementById('startTime').value;
+
+            if (!startDate || !startTime) {
+                alert('>>> ERROR: Please enter both Start Date and Start Time <<<');
+                return;
+            }
+
+            if (sessionData.isClockedIn) {
+                alert('>>> ERROR: Already clocked in! Clock out first. <<<');
+                return;
+            }
+
+            // Auto-populate with current date/time if not set
+            sessionData.startDate = startDate;
+            sessionData.startTime = startTime;
+            sessionData.isClockedIn = true;
+
+            const entry = {
+                startDate: startDate,
+                startTime: startTime,
+                action: 'CLOCK IN'
+            };
+
+            logs.push(entry);
+            localStorage.setItem('clockInOutLogs', JSON.stringify(logs));
+
+            alert('>>> CLOCKED IN SUCCESSFULLY <<<');
+            updateDisplay();
+            updateLog();
+        }
+
+        // Clock Out Function
+        function clockOut() {
+            const endDate = document.getElementById('endDate').value;
+            const endTime = document.getElementById('endTime').value;
+            const customerVisited = document.getElementById('customerVisited').value;
+
+            if (!endDate || !endTime) {
+                alert('>>> ERROR: Please enter both End Date and End Time <<<');
+                return;
+            }
+
+            if (!customerVisited.trim()) {
+                alert('>>> ERROR: Please enter the customer/location visited <<<');
+                return;
+            }
+
+            if (!sessionData.isClockedIn) {
+                alert('>>> ERROR: Not clocked in! Clock in first. <<<');
+                return;
+            }
+
+            sessionData.endDate = endDate;
+            sessionData.endTime = endTime;
+            sessionData.customerVisited = customerVisited;
+            sessionData.isClockedIn = false;
+
+            const entry = {
+                startDate: sessionData.startDate,
+                startTime: sessionData.startTime,
+                endDate: endDate,
+                endTime: endTime,
+                customerVisited: customerVisited,
+                action: 'CLOCK OUT'
+            };
+
+            logs.push(entry);
+            localStorage.setItem('clockInOutLogs', JSON.stringify(logs));
+
+            calculateHoursWorked(
+                `${sessionData.startDate}T${sessionData.startTime}`,
+                `${endDate}T${endTime}`
+            );
+
+            alert('>>> CLOCKED OUT SUCCESSFULLY <<<');
+            updateDisplay();
+            updateLog();
+            clearForm();
+        }
+
+        // Calculate hours worked
+        function calculateHoursWorked(startDateTime, endDateTime) {
+            const startDate = new Date(startDateTime);
+            const endDate = new Date(endDateTime);
+            const diff = endDate - startDate;
+
+            if (diff < 0) {
+                alert('>>> ERROR: End time must be after start time <<<');
+                return;
+            }
+
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('hoursWorked').textContent = `${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        // Update display
+        function updateDisplay() {
+            if (sessionData.isClockedIn) {
+                document.getElementById('status').textContent = 'CLOCKED IN';
+                document.getElementById('clockInDisplay').textContent = 
+                    `${sessionData.startDate} ${sessionData.startTime}`;
+                document.getElementById('clockOutDisplay').textContent = '--/-- --:--';
+            } else {
+                document.getElementById('status').textContent = 'CLOCKED OUT';
+                if (sessionData.endDate && sessionData.endTime) {
+                    document.getElementById('clockOutDisplay').textContent = 
+                        `${sessionData.endDate} ${sessionData.endTime}`;
+                    document.getElementById('lastCustomerDisplay').textContent = 
+                        sessionData.customerVisited || 'NONE';
+                }
+            }
+        }
+
+        // Update activity log
+        function updateLog() {
+            const logContainer = document.getElementById('logContainer');
+
+            if (logs.length === 0) {
+                logContainer.innerHTML = '<div class="empty-message">--- No Activity Yet ---</div>';
+                document.getElementById('lastUserName').textContent = 'NO ENTRY';
+                document.getElementById('lastUserDetails').textContent = 'No session data available';
+                return;
+            }
+
+            // Display logs
+            logContainer.innerHTML = logs.map((log, index) => {
+                const actionClass = log.action === 'CLOCK IN' ? 'in' : 'out';
+                const actionBadge = log.action === 'CLOCK IN' ? 
+                    '<span class="action-badge">[IN]</span>' : 
+                    '<span class="action-badge out">[OUT]</span>';
+
+                if (log.action === 'CLOCK IN') {
+                    return `
+                        <div class="log-entry ${actionClass}">
+                            <div class="log-entry-header">
+                                ${actionBadge} CLOCK IN
+                            </div>
+                            <div class="log-entry-details">
+                                Date: ${log.startDate} | Time: ${log.startTime}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="log-entry ${actionClass}">
+                            <div class="log-entry-header">
+                                ${actionBadge} CLOCK OUT
+                            </div>
+                            <div class="log-entry-details">
+                                Date: ${log.endDate} | Time: ${log.endTime}
+                                <br/>Customer: ${log.customerVisited}
+                            </div>
+                        </div>
+                    `;
+                }
+            }).reverse().join('');
+
+            // Update last user visited section
+            const lastEntry = logs[logs.length - 1];
+            if (lastEntry.action === 'CLOCK OUT') {
+                document.getElementById('lastUserName').textContent = lastEntry.customerVisited;
+                document.getElementById('lastUserDetails').innerHTML = `
+                    Out Date: ${lastEntry.endDate} | Time: ${lastEntry.endTime}
+                `;
+            }
+        }
+
+        // Clear form
+        function clearForm() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('startTime').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('endTime').value = '';
+            document.getElementById('customerVisited').value = '';
+        }
+
+        // Set today's date as default
+        function setDefaultDate() {
+            const today = formatDate(new Date());
+            document.getElementById('startDate').value = today;
+            document.getElementById('endDate').value = today;
+        }
+
+        // Initialize
+        updateCurrentDateTime();
+        setDefaultDate();
+        updateDisplay();
+        updateLog();
+
+        // Update time every second
+        setInterval(updateCurrentDateTime, 1000);
+    </script>
+</body>
+</html>
