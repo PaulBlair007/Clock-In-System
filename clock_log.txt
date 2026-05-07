@@ -1,0 +1,15 @@
+CLOCK IN/OUT LOG
+================
+Date Format: YYYY-MM-DD
+Time Format: HH:MM:SS
+Last User Visited: PaulBlair007
+
+Entry Log:
+----------
+
+2026-05-07 | 09:00:00 | CLOCK IN  | User: PaulBlair007
+2026-05-07 | 12:30:00 | CLOCK OUT | User: PaulBlair007
+2026-05-07 | 13:30:00 | CLOCK IN  | User: PaulBlair007
+2026-05-07 | 17:00:00 | CLOCK OUT | User: PaulBlair007
+
+Last User Visited: PaulBlair007 at 2026-05-07 17:00:00
