@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock In/Out System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .clock-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .date-time {
+            font-size: 18px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .time {
+            font-size: 48px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .clock-in-btn {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .clock-in-btn:hover {
+            background-color: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        }
+
+        .clock-out-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .clock-out-btn:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .button-group button:active {
+            transform: translateY(0);
+        }
+
+        .status-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .status-value {
+            color: #667eea;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .log-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .log-entry {
+            background: white;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .log-entry.in {
+            border-left-color: #27ae60;
+        }
+
+        .log-entry.out {
+            border-left-color: #e74c3c;
+        }
+
+        .log-time {
+            font-weight: bold;
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+
+        .log-action {
+            display: inline-block;
+            margin: 0 8px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .log-action.in {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .log-action.out {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .last-user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .last-user-label {
+            font-size: 12px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .last-user-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .time {
+                font-size: 36px;
+            }
+
+            button {
+                padding: 12px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⏱️ Clock In/Out System</h1>
+
+        <div class="clock-display">
+            <div class="date-time" id="currentDate"></div>
+            <div class="time" id="currentTime">00:00:00</div>
+        </div>
+
+        <div class="button-group">
+            <button class="clock-in-btn" onclick="clockIn()">Clock In</button>
+            <button class="clock-out-btn" onclick="clockOut()">Clock Out</button>
+        </div>
+
+        <div class="status-section">
+            <div class="status-item">
+                <span class="status-label">Current Status:</span>
+                <span class="status-value" id="status">Not Clocked In</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Clock In Time:</span>
+                <span class="status-value" id="clockInTime">--:--:--</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Clock Out Time:</span>
+                <span class="status-value" id="clockOutTime">--:--:--</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Hours Worked:</span>
+                <span class="status-value" id="hoursWorked">0h 0m</span>
+            </div>
+        </div>
+
+        <div class="log-section">
+            <div class="log-title">📋 Activity Log</div>
+            <div id="logContainer">
+                <div class="empty-message">No activity yet</div>
+            </div>
+        </div>
+
+        <div class="last-user">
+            <div class="last-user-label">Last User Visited</div>
+            <div class="last-user-name" id="lastUser">PaulBlair007</div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize with stored data or default
+        let logs = JSON.parse(localStorage.getItem('clockLogs')) || [];
+        let currentUser = 'PaulBlair007';
+        let isClockedIn = false;
+        let clockInTime = null;
+
+        // Update current time display
+        function updateTime() {
+            const now = new Date();
+            
+            // Update date
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+            
+            // Update time
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('currentTime').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        // Format time to HH:MM:SS
+        function formatTime(date) {
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        // Format date to YYYY-MM-DD
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Clock In
+        function clockIn() {
+            if (isClockedIn) {
+                alert('Already clocked in!');
+                return;
+            }
+
+            const now = new Date();
+            clockInTime = now;
+            isClockedIn = true;
+
+            const entry = {
+                date: formatDate(now),
+                time: formatTime(now),
+                action: 'CLOCK IN',
+                user: currentUser
+            };
+
+            logs.push(entry);
+            localStorage.setItem('clockLogs', JSON.stringify(logs));
+
+            updateDisplay();
+            updateLog();
+        }
+
+        // Clock Out
+        function clockOut() {
+            if (!isClockedIn) {
+                alert('Not clocked in!');
+                return;
+            }
+
+            const now = new Date();
+            isClockedIn = false;
+
+            const entry = {
+                date: formatDate(now),
+                time: formatTime(now),
+                action: 'CLOCK OUT',
+                user: currentUser
+            };
+
+            logs.push(entry);
+            localStorage.setItem('clockLogs', JSON.stringify(logs));
+
+            calculateHoursWorked(clockInTime, now);
+            updateDisplay();
+            updateLog();
+        }
+
+        // Calculate hours worked
+        function calculateHoursWorked(clockIn, clockOut) {
+            const diff = clockOut - clockIn;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById('hoursWorked').textContent = `${hours}h ${minutes}m`;
+        }
+
+        // Update display
+        function updateDisplay() {
+            if (isClockedIn) {
+                document.getElementById('status').textContent = 'Clocked In';
+                document.getElementById('status').style.color = '#27ae60';
+                document.getElementById('clockInTime').textContent = formatTime(clockInTime);
+                document.getElementById('clockOutTime').textContent = '--:--:--';
+            } else {
+                document.getElementById('status').textContent = 'Clocked Out';
+                document.getElementById('status').style.color = '#e74c3c';
+                if (logs.length > 0) {
+                    const lastClockOut = logs[logs.length - 1];
+                    if (lastClockOut.action === 'CLOCK OUT') {
+                        document.getElementById('clockOutTime').textContent = lastClockOut.time;
+                    }
+                }
+            }
+        }
+
+        // Update activity log
+        function updateLog() {
+            const logContainer = document.getElementById('logContainer');
+            
+            if (logs.length === 0) {
+                logContainer.innerHTML = '<div class="empty-message">No activity yet</div>';
+                return;
+            }
+
+            logContainer.innerHTML = logs.map((log, index) => {
+                const actionClass = log.action === 'CLOCK IN' ? 'in' : 'out';
+                return `
+                    <div class="log-entry ${actionClass}">
+                        <span class="log-time">${log.date} ${log.time}</span>
+                        <span class="log-action ${actionClass}">${log.action}</span>
+                        <span>| ${log.user}</span>
+                    </div>
+                `;
+            }).reverse().join('');
+
+            // Update last user visited
+            const lastUser = logs[logs.length - 1].user;
+            document.getElementById('lastUser').textContent = lastUser;
+        }
+
+        // Initialize
+        updateTime();
+        updateDisplay();
+        updateLog();
+
+        // Update time every second
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>
